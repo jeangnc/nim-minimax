@@ -129,8 +129,7 @@ int main(){
 
         do{
             printf("How many cubes do you want? ");
-
-            takenCubes = scanf("%d", &takenCubes);
+            scanf("%d", &takenCubes);
 
             if (takenCubes >= 1 && takenCubes <= K && root->cubesRemaining - takenCubes >= 0){
                 break;
