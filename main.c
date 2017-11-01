@@ -93,21 +93,50 @@ void podaArvore(int ultimaJogada) {
     if (ultimaJogada == 1){
         arvore = arvore->left;
     }
-    if (ultimaJogada == K){
+    if (ultimaJogada == K && arvore->right != NULL){
         arvore = arvore->right;
     }
 }
 
-int registraJogada(int palitosRemovidos) {
-    podaArvore(palitosRemovidos);
-    printf("%s tira %d palitos, restam %d\n", player, palitosRemovidos, arvore->palitosRestantes);
+int jogadaHumana() {
+    int palitosRemovidos;
 
-    // valida se o jogo já acabou e avisa quem ganhou
+    do{
+        printf("Quandos palitos deseja tirar? Número: ");
+        scanf("%d", &palitosRemovidos);
+
+        // valida se a jogada está dentro da faixa permitida
+        if ((palitosRemovidos != 1 && palitosRemovidos != K) || arvore->palitosRestantes - palitosRemovidos < 0){
+            printf("Jogada inválida. Escolha 1 ou %d palito(s)\n", K);
+            continue;
+        }
+
+        break;
+    } while (true);
+
+    return palitosRemovidos;
+}
+
+int melhorJogada() {
+    int palitosRemovidos = 0;
+    int v1,v2;
+
+    v1 = computeMinimax(arvore->left);
+    if (arvore->right != NULL){
+        v2 = computeMinimax(arvore->right);
+    }
+
+    palitosRemovidos = maximum(v1, v2);
+    return palitosRemovidos;
+}
+
+int registraJogada(int jogada) {
+    podaArvore(jogada);
+    printf("%s tira %d palitos, restam %d\n", player, jogada, arvore->palitosRestantes);
     if (arvore->palitosRestantes == 0){
         printf("O jogador %s ganhou o jogo!", player);
         return JOGO_FINALIZADO;
     }
-
     switchPlayer();
     return JOGADA_BEM_SUCEDIDA;
 }
@@ -119,35 +148,11 @@ int main(){
     arvore = buildGameTree(M);
 
     while (true){
-
-        int palitosRemovidos = 0;
-        int v1,v2;
-
-        v1 = computeMinimax(arvore->left);
-        if (arvore->right != NULL){
-            v2 = computeMinimax(arvore->right);
-        }
-
-        palitosRemovidos = maximum(v1, v2);
-
-        if (registraJogada(palitosRemovidos) == JOGO_FINALIZADO) {
+        if (registraJogada(melhorJogada()) == JOGO_FINALIZADO) {
             break;
         }
 
-        do{
-            printf("Quandos palitos deseja tirar? Número: ");
-            scanf("%d", &palitosRemovidos);
-
-            // valida se a jogada está dentro da faixa permitida
-            if ((palitosRemovidos != 1 && palitosRemovidos != K) || arvore->palitosRestantes - palitosRemovidos < 0){
-                printf("Jogada inválida. Escolha 1 ou %d palito(s)\n", K);
-                continue;
-            }
-
-            break;
-        } while (true);
-
-        if (registraJogada(palitosRemovidos) == JOGO_FINALIZADO) {
+        if (registraJogada(jogadaHumana()) == JOGO_FINALIZADO) {
             break;
         }
     }
