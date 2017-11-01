@@ -6,10 +6,15 @@
 #define M 13
 #define K 4
 
+const int JOGO_FINALIZADO = 1;
+const int JOGADA_BEM_SUCEDIDA = 2;
+const int JOGADA_INVALIDA = 3;
+
 char player[] = "MAX";
+struct Node * arvore;
 
 struct Node{
-    int cubesRemaining;
+    int palitosRestantes;
     struct Node *left;
     struct Node *right;
 }; 
@@ -41,26 +46,24 @@ char switchPlayer(){
     }
 }
 
-struct Node *buildGameTree(int ncubes){
-    struct Node *cube = calloc(1, sizeof(struct Node));
-    cube->cubesRemaining = ncubes;
+struct Node *buildGameTree(int npalitos){
+    struct Node *node = calloc(1, sizeof(struct Node));
+    node->palitosRestantes = npalitos;
 
-    if (cube->cubesRemaining >= 1){
-        cube->left = buildGameTree(ncubes - 1);
-        switchPlayer();
+    if (node->palitosRestantes >= 1){
+        node->left = buildGameTree(npalitos - 1);
     }
-    if (cube->cubesRemaining >= M){
-        cube->right = buildGameTree(ncubes - K);
-        switchPlayer();
+    if (node->palitosRestantes >= K){
+        node->right = buildGameTree(npalitos - K);
     }
 
-    return (cube);
+    return node;
 }
 
 int computeMinimax(struct Node *n){
     int value;
 
-    if (n->cubesRemaining == 0){
+    if (n->palitosRestantes == 0){
         if (strcmp(player, "MIN") == 0){
             return 1;
         }
@@ -84,72 +87,67 @@ int computeMinimax(struct Node *n){
     }
 
     return value;
+}
 
-} 
+void podaArvore(int ultimaJogada) {
+    if (ultimaJogada == 1){
+        arvore = arvore->left;
+    }
+    if (ultimaJogada == K){
+        arvore = arvore->right;
+    }
+}
+
+int registraJogada(int palitosRemovidos) {
+    podaArvore(palitosRemovidos);
+    printf("%s tira %d palitos, restam %d\n", player, palitosRemovidos, arvore->palitosRestantes);
+
+    // valida se o jogo já acabou e avisa quem ganhou
+    if (arvore->palitosRestantes == 0){
+        printf("O jogador %s ganhou o jogo!", player);
+        return JOGO_FINALIZADO;
+    }
+
+    switchPlayer();
+    return JOGADA_BEM_SUCEDIDA;
+}
+
 
 int main(){
-    struct Node *root = buildGameTree(M);
+    printf("Configuração do jogo: jogada máxima %d e número de palitos %d\n", K, M);
 
-    printf("WELCOME TO THE GAME\n");
+    arvore = buildGameTree(M);
 
     while (true){
-        int takenCubes = 0;
+
+        int palitosRemovidos = 0;
         int v1,v2;
 
-        v1 = computeMinimax(root->left);
-        if (root->right != NULL){
-            v2 = computeMinimax(root->right);
-        }
-        else{
-            v2 = 2;
+        v1 = computeMinimax(arvore->left);
+        if (arvore->right != NULL){
+            v2 = computeMinimax(arvore->right);
         }
 
-        if (v1 < v2){
-            takenCubes = 1;
-        }
-        else{
-            takenCubes = K;
-        }
+        palitosRemovidos = maximum(v1, v2);
 
-
-        if (takenCubes == 1){
-            root = root->left;
-        }
-        if (takenCubes == K){
-            root = root->right;
-        }
-
-        printf("MAX player(PC) takes %d cubes, remaining %d cubes\n", takenCubes, root->cubesRemaining);
-
-        if (root->cubesRemaining == 0){
-            printf("MAX player(PC) wins the game!");
+        if (registraJogada(palitosRemovidos) == JOGO_FINALIZADO) {
             break;
         }
 
-
         do{
-            printf("How many cubes do you want? ");
-            scanf("%d", &takenCubes);
+            printf("Quandos palitos deseja tirar? Número: ");
+            scanf("%d", &palitosRemovidos);
 
-            if (takenCubes >= 1 && takenCubes <= K && root->cubesRemaining - takenCubes >= 0){
-                break;
+            // valida se a jogada está dentro da faixa permitida
+            if ((palitosRemovidos != 1 && palitosRemovidos != K) || arvore->palitosRestantes - palitosRemovidos < 0){
+                printf("Jogada inválida. Escolha 1 ou %d palito(s)\n", K);
+                continue;
             }
 
-            printf("That's an illegal move. Choose 1 or %d matches.", K);
-
+            break;
         } while (true);
 
-        if (takenCubes == 1){
-            root = root->left;
-        }
-        if (takenCubes == K){
-            root = root->right;
-        }
-
-        printf("MIN player(human) takes %d cubes, leaving %d\n", takenCubes, root->cubesRemaining);
-
-        if (root->cubesRemaining == 0){
-            printf("MIN player(human) wins the game!");
+        if (registraJogada(palitosRemovidos) == JOGO_FINALIZADO) {
             break;
         }
     }
