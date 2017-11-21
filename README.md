@@ -9,4 +9,3 @@ Te goal of the game is to avoid taking the last object.
 ```sh
 $ gcc main.c -lpthread  -o ./nim
 $ ./nim
-```

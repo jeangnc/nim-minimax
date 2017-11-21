@@ -1,5 +1,5 @@
 #define K 4
-#define M 20
+#define M 10
 #define FIRST_PLAYER -1
 
 #include <string.h>
@@ -39,7 +39,7 @@ int seekBestPlay() {
     int currentMin = 500, currentMax = -500;
     for(int i=0; i<K && i < tree->remaining;i++) {
         struct Node *childNode = tree->children[i];
-        printf("Opção %d com minimax %d\n", i+1, childNode->minimax, playerName(childNode->currentPlayer));
+        printf("Opção %d com minimax %d\n", i+1, childNode->minimax);
         if(childNode->minimax < currentMin) {
             currentMin = childNode->minimax;
             minKey = i;
@@ -73,12 +73,9 @@ int humanInput() {
 
 int main() {
     printf("Configuração do jogo: jogada máxima %d e número de palitos %d\n\n", K, M);
-
-    tree = buildGameTree(M, FIRST_PLAYER);
+    tree = parallel_game_tree();
     while (true){
         if (storeMove(seekBestPlay()) == JOGO_FINALIZADO) break;
-        printf("\n");
         if (storeMove(humanInput()) == JOGO_FINALIZADO) break;
-        printf("\n\n");
     }
 }
