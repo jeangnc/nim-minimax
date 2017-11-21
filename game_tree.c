@@ -1,18 +1,18 @@
 struct Node {
     int remaining;
-    int playerValue;
     int minimax;
+    int currentPlayer;
     struct Node *children[K];
 };
 
 int computeMinimax(struct Node *n){
     if (n->remaining == 0) {
-        //ganha quem não estava jogando quando zerou
-        return n->playerValue * -1;
+        // quem jogou antes de zerar ganha
+        return n->currentPlayer * -1;
     }
     int minimaxSum = 0;
-    for(int i=0; i<K && i+1 <= n->remaining;i++) {
-        minimaxSum += n->children[i]->minimax;
+    for(int i=0; i<K && i<n->remaining;i++) {
+        minimaxSum += computeMinimax(n->children[i]);
     }
     return minimaxSum;
 }
@@ -20,7 +20,7 @@ int computeMinimax(struct Node *n){
 struct Node *buildGameTree(int npalitos, int currentPlayer){
     struct Node *node = calloc(1, sizeof(struct Node));
     node->remaining = npalitos;
-    node->playerValue = currentPlayer;
+    node->currentPlayer = currentPlayer;
     int nextPlayer = currentPlayer * -1;
     for (int i=0; i<K; i++) {
         int remaining =  npalitos - (i + 1);

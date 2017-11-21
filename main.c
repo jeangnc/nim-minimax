@@ -1,5 +1,5 @@
 #define K 4
-#define M 13
+#define M 20
 #define FIRST_PLAYER -1
 
 #include <string.h>
@@ -36,20 +36,15 @@ int storeMove(int removed) {
 
 int seekBestPlay() {
     int minKey, maxKey;
-    int currentMin=0, currentMax=0;
-    for(int i=0; i<K && i <= tree->remaining;i++) {
+    int currentMin = 500, currentMax = -500;
+    for(int i=0; i<K && i < tree->remaining;i++) {
         struct Node *childNode = tree->children[i];
-        printf("Opção %d com minimax %d (próximo jogador %s)\n", i+1, childNode->minimax, playerName(childNode->playerValue));
-        if (childNode->remaining == 0) {
-            minKey = i;
-            maxKey = i;
-            break;
-        }
-        if(currentMin == 0 || childNode->minimax < currentMin) {
+        printf("Opção %d com minimax %d\n", i+1, childNode->minimax, playerName(childNode->currentPlayer));
+        if(childNode->minimax < currentMin) {
             currentMin = childNode->minimax;
             minKey = i;
         }
-        if(currentMax == 0 || childNode->minimax > currentMax) {
+        if(childNode->minimax > currentMax) {
             currentMax = childNode->minimax;
             maxKey = i;
         }
