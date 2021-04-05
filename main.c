@@ -8,9 +8,8 @@
 #include <stdbool.h>
 #include "game_tree.c"
 
-const int JOGO_FINALIZADO = 1;
-const int JOGADA_BEM_SUCEDIDA = 2;
-const int JOGADA_INVALIDA = 3;
+const int FINISHED = 1;
+const int VALID_MOVE = 2;
 
 struct Node * tree;
 int currentPlayer = FIRST_PLAYER;
@@ -28,10 +27,10 @@ int storeMove(int removed) {
     printf("%s takes %d sticks, %d left\n", playerName(currentPlayer), removed, tree->remaining);
     if (tree->remaining == 0){
         printf("%s won!", playerName(currentPlayer));
-        return JOGO_FINALIZADO;
+        return FINISHED;
     }
     switchPlayer();
-    return JOGADA_BEM_SUCEDIDA;
+    return VALID_MOVE;
 }
 
 int seekBestPlay() {
@@ -75,7 +74,7 @@ int main() {
     printf("Game configuration: max %d and %d sticks.\n\n", K, M);
     tree = parallel_game_tree();
     while (true){
-        if (storeMove(seekBestPlay()) == JOGO_FINALIZADO) break;
-        if (storeMove(humanInput()) == JOGO_FINALIZADO) break;
+        if (storeMove(seekBestPlay()) == FINISHED) break;
+        if (storeMove(humanInput()) == FINISHED) break;
     }
 }
