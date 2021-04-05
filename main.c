@@ -62,7 +62,7 @@ int human_input() {
             continue;
         }
         if (tree->remaining - removed < 0){
-            printf("Inlvaid play. Only %d sticks remaining.\n", tree->remaining);
+            printf("Invalid play. Only %d sticks remaining.\n", tree->remaining);
             continue;
         }
         break;
