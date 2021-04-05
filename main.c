@@ -14,26 +14,26 @@ const int VALID_MOVE = 2;
 struct Node * tree;
 int currentPlayer = FIRST_PLAYER;
 
-char* playerName(int playerNumber) {
+char* player_name(int playerNumber) {
     return playerNumber == -1 ? "PC" : "Human";
 }
 
-void switchPlayer() {
+void switch_player() {
     currentPlayer *= -1;
 }
 
-int storeMove(int removed) {
+int store_move(int removed) {
     tree = tree->children[removed - 1];
-    printf("%s takes %d sticks, %d left\n", playerName(currentPlayer), removed, tree->remaining);
+    printf("%s takes %d sticks, %d left\n", player_name(currentPlayer), removed, tree->remaining);
     if (tree->remaining == 0){
-        printf("%s won!", playerName(currentPlayer));
+        printf("%s won!", player_name(currentPlayer));
         return FINISHED;
     }
-    switchPlayer();
+    switch_player();
     return VALID_MOVE;
 }
 
-int seekBestPlay() {
+int seek_best_move() {
     int minKey, maxKey;
     int currentMin = 500, currentMax = -500;
     for(int i=0; i<K && i < tree->remaining;i++) {
@@ -51,10 +51,10 @@ int seekBestPlay() {
     return (currentPlayer == -1 ? minKey : maxKey) + 1;
 }
 
-int humanInput() {
+int human_input() {
     int removed;
     do{
-        seekBestPlay();
+        seek_best_move();
         printf("How many sticks do you want to take? Number (max %d): ", K);
         scanf("%d", &removed);
         if (removed > K || removed < 0){
@@ -74,7 +74,7 @@ int main() {
     printf("Game configuration: max %d and %d sticks.\n\n", K, M);
     tree = parallel_game_tree();
     while (true){
-        if (storeMove(seekBestPlay()) == FINISHED) break;
-        if (storeMove(humanInput()) == FINISHED) break;
+        if (store_move(seek_best_move()) == FINISHED) break;
+        if (store_move(human_input()) == FINISHED) break;
     }
 }
