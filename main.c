@@ -12,21 +12,21 @@ const int FINISHED = 1;
 const int VALID_MOVE = 2;
 
 struct Node * tree;
-int currentPlayer = FIRST_PLAYER;
+int current_player = FIRST_PLAYER;
 
-char* player_name(int playerNumber) {
-    return playerNumber == -1 ? "PC" : "Human";
+char* player_name(int player_number) {
+    return player_number == -1 ? "PC" : "Human";
 }
 
 void switch_player() {
-    currentPlayer *= -1;
+    current_player *= -1;
 }
 
 int store_move(int removed) {
     tree = tree->children[removed - 1];
-    printf("%s takes %d sticks, %d left\n", player_name(currentPlayer), removed, tree->remaining);
+    printf("%s takes %d sticks, %d left\n", player_name(current_player), removed, tree->remaining);
     if (tree->remaining == 0){
-        printf("%s won!", player_name(currentPlayer));
+        printf("%s won!", player_name(current_player));
         return FINISHED;
     }
     switch_player();
@@ -34,21 +34,21 @@ int store_move(int removed) {
 }
 
 int seek_best_move() {
-    int minKey, maxKey;
-    int currentMin = 500, currentMax = -500;
+    int min_key, max_key;
+    int current_min = 500, current_max = -500;
     for(int i=0; i<K && i < tree->remaining;i++) {
-        struct Node *childNode = tree->children[i];
-        printf("%d option has score %d\n", i+1, childNode->minimax);
-        if(childNode->minimax < currentMin) {
-            currentMin = childNode->minimax;
-            minKey = i;
+        struct Node *child_node = tree->children[i];
+        printf("%d option has score %d\n", i+1, child_node->minimax);
+        if(child_node->minimax < current_min) {
+            current_min = child_node->minimax;
+            min_key = i;
         }
-        if(childNode->minimax > currentMax) {
-            currentMax = childNode->minimax;
-            maxKey = i;
+        if(child_node->minimax > current_max) {
+            current_max = child_node->minimax;
+            max_key = i;
         }
     }
-    return (currentPlayer == -1 ? minKey : maxKey) + 1;
+    return (current_player == -1 ? min_key : max_key) + 1;
 }
 
 int human_input() {
