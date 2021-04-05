@@ -1,4 +1,4 @@
-#define K 4
+#define K 3
 #define M 10
 #define FIRST_PLAYER -1
 
