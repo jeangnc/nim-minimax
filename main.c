@@ -16,7 +16,7 @@ struct Node * tree;
 int currentPlayer = FIRST_PLAYER;
 
 char* playerName(int playerNumber) {
-    return playerNumber == -1 ? "PC" : "Humano";
+    return playerNumber == -1 ? "PC" : "Human";
 }
 
 void switchPlayer() {
@@ -25,9 +25,9 @@ void switchPlayer() {
 
 int storeMove(int removed) {
     tree = tree->children[removed - 1];
-    printf("%s tira %d palitos, restam %d\n", playerName(currentPlayer), removed, tree->remaining);
+    printf("%s takes %d sticks, %d left\n", playerName(currentPlayer), removed, tree->remaining);
     if (tree->remaining == 0){
-        printf("O jogador %s ganhou o jogo!", playerName(currentPlayer));
+        printf("%s won!", playerName(currentPlayer));
         return JOGO_FINALIZADO;
     }
     switchPlayer();
@@ -39,7 +39,7 @@ int seekBestPlay() {
     int currentMin = 500, currentMax = -500;
     for(int i=0; i<K && i < tree->remaining;i++) {
         struct Node *childNode = tree->children[i];
-        printf("Opção %d com minimax %d\n", i+1, childNode->minimax);
+        printf("%d option has score %d\n", i+1, childNode->minimax);
         if(childNode->minimax < currentMin) {
             currentMin = childNode->minimax;
             minKey = i;
@@ -56,14 +56,14 @@ int humanInput() {
     int removed;
     do{
         seekBestPlay();
-        printf("Quandos palitos deseja tirar? Número: ");
+        printf("How many sticks do you want to take? Number (max %d): ", K);
         scanf("%d", &removed);
         if (removed > K || removed < 0){
-            printf("Jogada inválida. Escolha entre 1 e %d palito(s)\n", K);
+            printf("Invalid play.\n");
             continue;
         }
         if (tree->remaining - removed < 0){
-            printf("Jogada inválida. Restam apenas %d palito(s)\n", tree->remaining);
+            printf("Inlvaid play. Only %d sticks remaining.\n", tree->remaining);
             continue;
         }
         break;
@@ -72,7 +72,7 @@ int humanInput() {
 }
 
 int main() {
-    printf("Configuração do jogo: jogada máxima %d e número de palitos %d\n\n", K, M);
+    printf("Game configuration: max %d and %d sticks.\n\n", K, M);
     tree = parallel_game_tree();
     while (true){
         if (storeMove(seekBestPlay()) == JOGO_FINALIZADO) break;
